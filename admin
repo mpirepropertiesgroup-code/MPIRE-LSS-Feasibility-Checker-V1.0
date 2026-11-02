@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#15191f">
+<title>MPIRE LSS Feasibility Checker</title>
+<style>
+:root{--bg:#f3f5f8;--panel:#fff;--ink:#17202b;--muted:#687586;--line:#e3e8ef;--red:#c92f3b;--orange:#f28c28;--green:#16845b;--blue:#2865a8;--dark:#15191f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,#15191f,#292f38);color:white;padding:26px max(18px,calc((100vw - 1180px)/2));border-bottom:4px solid var(--red)}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.logo{font-size:25px;font-weight:900;letter-spacing:2px}.logo span{color:#ef535d}.tag{font-size:11px;letter-spacing:1.7px;color:#c8d0da}.hero h1{font-size:clamp(25px,4vw,39px);line-height:1.1;margin:20px 0 8px}.hero p{color:#cbd2dc;margin:0;max-width:760px}
+main{max-width:1180px;margin:24px auto;padding:0 16px 48px}.notice{background:#fff8e8;border:1px solid #f2d69a;border-radius:12px;padding:13px 15px;color:#72521c;margin-bottom:18px;font-size:13px}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:19px;box-shadow:0 3px 14px #1b2a3a08;margin-bottom:18px}.panel h2{font-size:18px;margin:0 0 4px}.sub{color:var(--muted);font-size:12px;margin:0 0 16px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.pill{font-size:11px;border-radius:30px;padding:4px 9px;background:#fcebed;color:#a7212d;font-weight:700}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}label{font-size:12px;font-weight:700;color:#455263}input,select{width:100%;padding:10px 11px;border:1px solid #d7dee7;border-radius:8px;background:#fff;color:#17202b;font:inherit;font-size:14px;min-width:0}input:focus,select:focus{outline:2px solid #c9ddf5;border-color:#4a83c4}.hint{font-size:11px;color:#7a8796}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.btn{border:0;border-radius:9px;padding:10px 15px;font-weight:750;cursor:pointer;font-size:13px}.primary{background:var(--red);color:white}.secondary{background:#eaf0f6;color:#26384d}.darkbtn{background:#202833;color:white}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kpi{background:#f7f9fb;border:1px solid var(--line);border-radius:11px;padding:13px}.kpi small{display:block;color:var(--muted);font-size:11px}.kpi strong{display:block;font-size:23px;letter-spacing:-.5px;margin-top:3px}.kpi em{font-size:11px;color:var(--muted);font-style:normal}
+.score-wrap{display:flex;align-items:center;gap:17px}.score{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--green) var(--score,0%),#e8edf2 0);position:relative;flex:none}.score:before{content:"";position:absolute;inset:8px;background:white;border-radius:50%}.score b{position:relative;font-size:22px}.status{font-weight:800;font-size:17px}.statusline{font-size:12px;color:var(--muted)}
+.barrow{margin:12px 0}.barlabel{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}.bar{height:8px;background:#edf1f5;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#e6a13c,#16845b);width:0}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line)}th{color:#647184;font-weight:700}td:last-child,th:last-child{text-align:right}
+.callout{border-left:4px solid var(--blue);background:#f1f6fc;padding:12px;border-radius:7px;font-size:12px;color:#40536b;margin-top:12px}.warning{border-left-color:var(--orange);background:#fff8ef;color:#74501e}
+footer{text-align:center;color:#7a8796;font-size:11px;padding:20px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}@media(max-width:480px){.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.kpi strong{font-size:20px}.panel{padding:15px}}
+@media print{body{background:white}.no-print,header .tag{display:none!important}main{max-width:none;margin:0;padding:10px}.layout{grid-template-columns:1fr 1fr}.panel{break-inside:avoid;box-shadow:none}.notice{break-inside:avoid}header{padding:15px}.actions{display:none}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">MPIRE<span>.</span> PROPERTIES</div><div class="tag">HOMEFIELD REAL ESTATE SDN. BHD.</div></div>
+ <div class="hero"><h1>LSS PROJECT<br>FEASIBILITY CHECKER</h1><p>Penilaian awal potensi tanah untuk pembangunan Large Scale Solar (LSS) di Malaysia — merangkumi kapasiti, grid, teknikal dan unjuran kewangan.</p></div>
+</header>
+<main>
+ <div class="notice"><b>Penting — alat saringan awal sahaja.</b> Keputusan ialah anggaran berasaskan input dan andaian pengguna, bukan kelulusan, tawaran sambungan grid, nasihat kejuruteraan, penilaian profesional atau jaminan pulangan. Sahkan semua data dengan jurukur, perunding solar, TNB, pihak berkuasa dan penasihat undang-undang. Keperluan program LSS dan tarif boleh berubah mengikut pusingan tender.</div>
+ <div class="layout">
+  <section>
+   <div class="panel">
+    <div class="section-title"><div><h2>01. Maklumat tanah & projek</h2><p class="sub">Masukkan butiran tapak untuk memulakan penilaian.</p></div><span class="pill">SITE INPUT</span></div>
+    <div class="fields">
+     <div class="field full"><label>Nama projek / pemilik tanah</label><input id="project" placeholder="Contoh: LSS Kulim Utara"></div>
+     <div class="field"><label>Negeri</label><select id="state"><option>Kedah</option><option>Perlis</option><option>Pulau Pinang</option><option>Perak</option><option>Selangor</option><option>Negeri Sembilan</option><option>Melaka</option><option>Johor</option><option>Pahang</option><option>Terengganu</option><option>Kelantan</option><option>Sabah</option><option>Sarawak</option><option>Wilayah Persekutuan</option></select></div>
+     <div class="field"><label>Daerah / mukim</label><input id="district" placeholder="Contoh: Kulim"></div>
+     <div class="field"><label>Keluasan tanah (ekar)</label><input id="acres" type="number" min="0" step=".01" value="100"></div>
+     <div class="field"><label>Keluasan boleh dibangunkan (%)</label><input id="usable" type="number" min="0" max="100" value="80"></div>
+     <div class="field"><label>Status pegangan</label><select id="tenure"><option>Freehold</option><option>Leasehold</option><option>Tanah kerajaan / pajakan</option><option>Belum disahkan</option></select></div>
+     <div class="field"><label>Kategori / syarat tanah</label><select id="landuse"><option>Pertanian</option><option>Bangunan</option><option>Industri</option><option>Lain-lain / belum disahkan</option></select></div>
+     <div class="field"><label>Zoning / kesesuaian guna tanah</label><select id="zoning"><option value="1">Disahkan sesuai</option><option value=".65">Berpotensi, perlu semakan</option><option value=".25">Tidak sesuai / bercanggah</option><option value=".5">Belum disahkan</option></select></div>
+     <div class="field"><label>Keadaan topografi</label><select id="terrain"><option value="1">Rata / landai</option><option value=".75">Beralun sederhana</option><option value=".4">Curam / berbukit</option><option value=".6">Belum dinilai</option></select></div>
+     <div class="field"><label>Risiko banjir</label><select id="flood"><option value="1">Tiada rekod / rendah (disahkan)</option><option value=".7">Sederhana</option><option value=".3">Tinggi</option><option value=".6">Belum disemak</option></select></div>
+     <div class="field"><label>Halangan / teduhan</label><select id="shade"><option value="1">Rendah</option><option value=".7">Sederhana</option><option value=".35">Tinggi</option><option value=".6">Belum dinilai</option></select></div>
+    </div>
+   </div>
+   <div class="panel">
+    <div class="section-title"><div><h2>02. Grid & sambungan</h2><p class="sub">Jarak indikatif sahaja; kapasiti grid mesti disahkan melalui kajian rasmi.</p></div><span class="pill">GRID</span></div>
+    <div class="fields">
+     <div class="field"><label>Jarak ke PMU / pencawang (km)</label><input id="grid" type="number" min="0" step=".1" value="5"></div>
+     <div class="field"><label>Voltan / jenis sambungan</label><select id="voltage"><option value="1">132kV / 275kV berdekatan</option><option value=".8">33kV / 11kV sahaja dikenal pasti</option><option value=".55">Belum dikenal pasti</option></select></div>
+     <div class="field"><label>Kapasiti grid tersedia (MW)</label><input id="gridcap" type="number" min="0" step=".1" placeholder="Kosong jika belum diketahui"></div>
+     <div class="field"><label>Status semakan TNB / grid</label><select id="gridstatus"><option value="1">Maklum balas / kajian rasmi positif</option><option value=".7">Perbincangan awal</option><option value=".45">Belum dibuat semakan</option><option value=".2">Kekangan grid dikenal pasti</option></select></div>
+    </div>
+   </div>
+   <div class="panel">
+    <div class="section-title"><div><h2>03. Andaian teknikal & kewangan</h2><p class="sub">Nilai lalai ialah andaian perancangan, bukan kadar pasaran atau tawaran rasmi.</p></div><span class="pill">MODEL</span></div>
+    <div class="fields">
+     <div class="field"><label>Kecekapan penggunaan tanah (MWp / ekar)</label><input id="density" type="number" min=".01" step=".01" value=".20"></div>
+     <div class="field"><label>CAPEX (RM juta / MWp)</label><input id="capex" type="number" min="0" step=".01" value="2.8"></div>
+     <div class="field"><label>Hasil tenaga (MWh / MWp / tahun)</label><input id="yield" type="number" min="0" step="10" value="1450"></div>
+     <div class="field"><label>Harga jualan tenaga (RM / MWh)</label><input id="tariff" type="number" min="0" step="1" value="250"></div>
+     <div class="field"><label>OPEX tahunan (% daripada CAPEX)</label><input id="opex" type="number" min="0" max="100" step=".1" value="1.5"></div>
+     <div class="field"><label>Anggaran kos grid (RM juta)</label><input id="gridcost" type="number" min="0" step=".1" value="5"></div>
+     <div class="field"><label>Harga / kos tanah (RM juta)</label><input id="landcost" type="number" min="0" step=".1" value="3"></div>
+     <div class="field"><label>Tempoh operasi (tahun)</label><input id="years" type="number" min="1" max="40" value="25"></div>
+    </div>
+    <div class="actions no-print"><button class="btn primary" id="calculate">Kira feasibility</button><button class="btn secondary" id="reset">Reset contoh</button></div>
+   </div>
+  </section>
+  <section>
+   <div class="panel">
+    <div class="section-title"><div><h2>Dashboard keputusan</h2><p class="sub">Dikemas kini apabila butang kira ditekan.</p></div><span class="pill">LIVE MODEL</span></div>
+    <div class="score-wrap"><div class="score" id="scoreRing"><b id="score">--</b></div><div><div class="status" id="status">Menunggu input</div><div class="statusline" id="statusline">Lengkapkan maklumat tapak dan tekan Kira feasibility.</div></div></div>
+    <div style="margin-top:18px" class="kpis">
+     <div class="kpi"><small>Potensi kapasiti DC</small><strong id="mw">—</strong><em>MWp anggaran</em></div>
+     <div class="kpi"><small>Tanah efektif</small><strong id="effective">—</strong><em>ekar</em></div>
+     <div class="kpi"><small>Jumlah anggaran CAPEX</small><strong id="investment">—</strong><em>RM juta termasuk grid & tanah</em></div>
+     <div class="kpi"><small>Payback ringkas</small><strong id="payback">—</strong><em>tahun, sebelum pembiayaan/cukai</em></div>
+    </div>
+   </div>
+   <div class="panel">
+    <h2>Unjuran kewangan tahunan</h2><p class="sub">Anggaran kasar berdasarkan input harga tenaga, yield dan OPEX.</p>
+    <table><tbody>
+     <tr><td>Penjanaan tenaga</td><td id="energy">—</td></tr>
+     <tr><td>Hasil kasar tahunan</td><td id="revenue">—</td></tr>
+     <tr><td>OPEX tahunan</td><td id="annualopex">—</td></tr>
+     <tr><td>Aliran tunai operasi (sebelum cukai/financing)</td><td id="cashflow">—</td></tr>
+     <tr><td>Simple annual return on total cost</td><td id="roi">—</td></tr>
+     <tr><td>Jumlah hasil kasar sepanjang tempoh operasi</td><td id="lifetime">—</td></tr>
+    </tbody></table>
+    <div class="callout warning">Model ini tidak mengambil kira degradasi panel, downtime, curtailment, kos pembiayaan, cukai, insurans, decommissioning, inflasi, struktur PPA/tender atau perubahan tarif. ROI dan payback bukan IRR/NPV.</div>
+   </div>
+   <div class="panel">
+    <h2>Skor penilaian indikatif</h2><p class="sub">Skor membantu menyusun due diligence; ia bukan kriteria rasmi Suruhanjaya Tenaga atau TNB.</p>
+    <div id="bars"></div>
+   </div>
+   <div class="panel">
+    <h2>Semakan tindakan seterusnya</h2><p class="sub">Perkara yang perlu disahkan sebelum membuat keputusan pelaburan.</p>
+    <ul id="checks" style="padding-left:19px;font-size:13px;color:#475569;margin-bottom:0"><li>Masukkan data dan jalankan analisis.</li></ul>
+    <div class="actions no-print"><button class="btn darkbtn" id="print">Cetak / Simpan PDF</button><button class="btn secondary" id="csv">Muat turun CSV</button></div>
+   </div>
+  </section>
+ </div>
+ <footer>MPIRE PROPERTIES • HOMEFIELD REAL ESTATE SDN. BHD. • MPIRE LSS FEASIBILITY CHECKER<br>Versi 1.0 — model saringan awal, bukan dokumen kelulusan atau nasihat profesional.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const ids=['project','state','district','acres','usable','tenure','landuse','zoning','terrain','flood','shade','grid','voltage','gridcap','gridstatus','density','capex','yield','tariff','opex','gridcost','landcost','years'];
+const num=id=>Math.max(0,Number($(id).value)||0);
+const val=id=>$(id).value;
+const fmt=(n,d=2)=>Number.isFinite(n)?n.toLocaleString('en-MY',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
+const rm=n=>'RM '+fmt(n,2);
+let last={};
+function calculate(){
+ const acres=num('acres'), usable=num('usable')/100, eff=acres*usable, mw=eff*num('density');
+ const capex=mw*num('capex'), total=capex+num('gridcost')+num('landcost');
+ const energy=mw*num('yield'), revenue=energy*num('tariff')/1e6, opex=capex*num('opex')/100, cash=revenue-opex;
+ const payback=cash>0?total/cash:Infinity, roi=total>0?cash/total*100:0, life=revenue*num('years');
+ const gridDist=num('grid'), gridScore=gridDist<=2?100:gridDist<=5?85:gridDist<=10?65:gridDist<=20?40:20;
+ const landScore=(Number(val('zoning'))*35+Number(val('terrain'))*25+Number(val('flood'))*20+Number(val('shade'))*20);
+ const gridComposite=gridScore*.35+Number(val('voltage'))*100*.2+Number(val('gridstatus'))*100*.45;
+ const scaleScore=Math.min(100,mw/50*100);
+ const financeScore=Math.max(0,Math.min(100,roi*5));
+ const overall=Math.round(landScore*.35+gridComposite*.30+scaleScore*.15+financeScore*.20);
+ let status=overall>=75?'Berpotensi — teruskan due diligence':overall>=55?'Bersyarat — perlu pengesahan lanjut':'Risiko tinggi — semak semula tapak';
+ $('score').textContent=overall;$('scoreRing').style.setProperty('--score',overall+'%');
+ $('status').textContent=status;$('statusline').textContent='Skor saringan indikatif daripada 100; bukan keputusan kelulusan.';
+ $('mw').textContent=fmt(mw,2);$('effective').textContent=fmt(eff,2);$('investment').textContent=fmt(total,2);$('payback').textContent=Number.isFinite(payback)?fmt(payback,1):'N/A';
+ $('energy').textContent=fmt(energy,0)+' MWh';$('revenue').textContent=rm(revenue)+' juta';$('annualopex').textContent=rm(opex)+' juta';$('cashflow').textContent=rm(cash)+' juta';$('roi').textContent=fmt(roi,2)+'%';$('lifetime').textContent=rm(life)+' juta';
+ const bars=[['Kesesuaian tapak',landScore],['Grid & sambungan',gridComposite],['Skala kapasiti',scaleScore],['Daya tarikan kewangan',financeScore]];
+ $('bars').innerHTML=bars.map(([n,v])=>`<div class="barrow"><div class="barlabel"><span>${n}</span><b>${fmt(v,0)}/100</b></div><div class="bar"><i style="width:${Math.max(0,Math.min(100,v))}%"></i></div></div>`).join('');
+ const checks=[];
+ if(val('zoning')!=='1')checks.push('Dapatkan pengesahan zoning, Rancangan Tempatan dan kebenaran merancang daripada PBT/PLANMalaysia.');
+ if(val('tenure')==='Belum disahkan'||val('tenure')==='Leasehold')checks.push('Semak hak milik, baki pajakan, sekatan kepentingan, kaveat, bebanan dan keperluan kebenaran pindah milik/pajakan.');
+ checks.push('Lantik jurukur/perunding untuk ukur sempadan, kontur, cerun, saliran, geoteknikal dan keluasan bersih boleh guna.');
+ if(val('flood')!=='1')checks.push('Semak sejarah banjir, peta risiko, paras banjir reka bentuk dan keperluan mitigasi.');
+ if(val('gridstatus')!=='1'||!val('gridcap'))checks.push('Dapatkan semakan rasmi TNB/grid: kapasiti hosting, titik sambungan, kajian sistem, kos dan jadual naik taraf.');
+ checks.push('Sahkan laluan akses, hak laluan kabel, utiliti sedia ada, kawasan sensitif alam sekitar dan keperluan EIA jika berkenaan.');
+ checks.push('Sahkan kelayakan program/tender LSS semasa, syarat Suruhanjaya Tenaga, struktur offtake/PPA dan tarif sebenar.');
+ checks.push('Minta model kewangan terperinci: IRR, NPV, DSCR, pembiayaan, cukai, insurans, degradasi dan kos nyahpasang.');
+ $('checks').innerHTML=checks.map(x=>'<li style="margin:7px 0">'+x+'</li>').join('');
+ last={project:val('project'),state:val('state'),district:val('district'),land_acres:acres,effective_acres:eff,capacity_MWp:mw,grid_distance_km:gridDist,estimated_total_cost_RM_million:total,annual_energy_MWh:energy,annual_revenue_RM_million:revenue,annual_opex_RM_million:opex,annual_operating_cashflow_RM_million:cash,simple_return_percent:roi,simple_payback_years:Number.isFinite(payback)?payback:'N/A',feasibility_score:overall,status};
+}
+$('calculate').addEventListener('click',calculate);
+$('reset').addEventListener('click',()=>{if(confirm('Reset semua input kepada contoh asal?'))location.reload()});
+$('print').addEventListener('click',()=>{if(!last.capacity_MWp)calculate();window.print()});
+$('csv').addEventListener('click',()=>{if(!last.capacity_MWp)calculate();const rows=[['Item','Value'],...Object.entries(last)];const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='mpire-lss-feasibility.csv';a.click();URL.revokeObjectURL(a.href)});
+calculate();
+</script>
+</body></html>
